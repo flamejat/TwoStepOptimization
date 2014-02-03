@@ -17,13 +17,14 @@
 %   Wi:         Integral of disturbance at fast sampling. Matrix Dx1.
 %   xmax:       Maximum state constraint. Real.
 %   xmin:       Minimum state constraint. Real.
+%	ops:		Yalmip's solver options.
 % Outputs:
 %   u:          Binary control action. Matrix MxK.
 %   Umisum:     Integral control action. Integer.
 %   L:          Indirect sampling time. Integer.
 
 
-function [u, Umisum, L] = SecondStageBIP( Ui, Delta_Ci, L, x0, A, B, Wi, xmax, xmin)
+function [u, Umisum, L] = SecondStageBIP( Ui, Delta_Ci, L, x0, A, B, Wi, xmax, xmin, ops)
 
 
 % 0. - VARIABLE DEFINITION
@@ -100,7 +101,7 @@ SumMatrix = [ repmat([1, 0], 1, K);repmat([0, 1], 1, K)];
 u = binvar( M*K, 1);
 Constraints = [  SumMatrix * u == (Ui * K/Delta_Ci), Alp * u <= blp  ];
 
-solvesdp(Constraints);
+solvesdp(Constraints, [],ops);
  
 uu = double(u);
 

@@ -1,7 +1,4 @@
-% Function that solves the first stage that is the LP of the two steps
-% procedure.
-%
-%
+% Function that plots the system's volumes evolution and the pumping state over time
 %
 % function [U,Energy,Cost]=First_Stage_LP(C, x0, A, B, W, Pmss, xmax, xmin)
 %

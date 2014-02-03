@@ -6,21 +6,22 @@
 % function [U,Energy,Cost]=First_Stage_LP(C, x0, A, B, W, Pmss, xmax, xmin)
 %
 % Inputs:
-%   C:          Electricity price per period. Vector 1xN
-%   x0:         Initial state value. Vector nx1
-%   A:          Dynamic matrix. Matrix nxn
-%   B:          Control Matrix. Matrix nxM
-%   W:          Integral of disturbance per time interval. Matrix DxN
-%   Pmss:       Steady state power consmption of each actuator. Vector 1xM
-%   xmax:       Maximum state constraint. Matrix nx1
-%   xmin:       Minimum state constraint. Matrix nx1
+%   C:          Electricity price per period. Vector 1xN.
+%   x0:         Initial state value. Vector nx1.
+%   A:          Dynamic matrix. Matrix nxn.
+%   B:          Control Matrix. Matrix nxM.
+%   W:          Integral of disturbance per time interval. Matrix DxN.
+%   Pmss:       Steady state power consmption of each actuator. Vector 1xM.
+%   xmax:       Maximum state constraint. Matrix nx1.
+%   xmin:       Minimum state constraint. Matrix nx1.
+%   ops:		Yalmip's solver options.
 % Outputs:
-%   U:          Integral control action. Matrix MxN
-%   Energy:     Amount of energy consumed. Real
-%   Cost:       Energy cost. Real
+%   U:          Integral control action. Matrix MxN.
+%   Energy:     Amount of energy consumed. Real.
+%   Cost:       Energy cost. Real.
 
 
-function [ U, Energy, EnergyCost ] = FirstStageLP( C, x0, A, B, W, Pmss, xmax, xmin)
+function [ U, Energy, EnergyCost ] = FirstStageLP( C, x0, A, B, W, Pmss, xmax, xmin, ops)
 
 N = length( C );  
 
@@ -51,7 +52,7 @@ for i = 1:N
 end
 
 % blp matrix in Alp * x < blp
-blp = [ kron( -Iden, (xmin-x0) ); kron( Iden,(xmax-x0)) ] + [ Wbar; -Wbar ];     % Matriz blp, Alp x <= blp
+blp = [ kron( -Iden, (xmin-x0) ); kron( Iden,(xmax-x0)) ] + [ Wbar; -Wbar ];     % blp Matrix, Alp x <= blp
 
 %Optimization call
 Constraints = [Alp * V <= blp, U >= 0 ];

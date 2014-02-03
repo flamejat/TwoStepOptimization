@@ -44,16 +44,16 @@ P2   = 6;                             % Power of Pump 2
 Pmss =[P1 P2];
 
 % Solver Options
-ops  = sdpsettings('solver','glpk');
-%ops  = sdpsettings('solver','lpsolve');
-%ops = sdpsettings('solver','lpsolve','cachesolvers',1);
+ops = sdpsettings('solver','glpk');
+ops2  = sdpsettings('solver','lpsolve');
+ops3 = sdpsettings('solver','lpsolve','cachesolvers',1);
 
 
 %% Test of the First Stage (LP)
 % DESCRIPTIVE TEXT
 
 %First Stage Call (Linear Programming problem)
-[U,Energy,Cost]=FirstStageLP(C,x0,A,B,W,Pmss,xmax,xmin,ops);
+[U,Energy,Cost]=FirstStageLP(C,x0,A,B,W,Pmss,xmax,xmin, ops);
 
 
 %% Test of second Stage (BIP)
@@ -74,7 +74,7 @@ L = 2;
 
 signals = [];
 for i = 1:6
-   	u = SecondStageBIP( Um(:, i) , Delta_C(i), L , x0, A, B , W(:,i), xmax, xmin);
+   	u = SecondStageBIP( Um(:, i) , Delta_C(i), L , x0, A, B , W(:,i), xmax, xmin, ops2);
   	signals = [ signals; u ];
 end
 
