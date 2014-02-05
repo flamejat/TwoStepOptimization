@@ -20,8 +20,6 @@
 %   Energy:     Amount of energy consumed. Real.
 %   Cost:       Energy cost. Real.
 
-% PRUEBA
-
 
 function [ U, Energy, EnergyCost ] = FirstStageLP( C, x0, A, B, W, Pmss, xmax, xmin, ops)
 
