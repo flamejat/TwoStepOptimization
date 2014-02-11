@@ -9,8 +9,6 @@
 %% Setting up the problem
 %
 % NOTE: YALMIP AND SOLVERS PATHS MUST BE INSTALLED AND LOADED
-
-addpath(genpath('~/Downloads/solvers'))
 close all
 clear all
 

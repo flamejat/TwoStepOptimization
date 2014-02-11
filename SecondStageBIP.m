@@ -110,7 +110,7 @@ for k = 1:2:2*K
     u = [u; uu(k:k+1)'];       % Extracts control actions u to an MxN matrix
 end
 
-% Minute-wise pump state disctetization
+% Minute-wise pump state discretization
 
 u = kron( u, ones(Delta_Ci/K,1));
 
