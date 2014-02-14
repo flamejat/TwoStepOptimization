@@ -80,7 +80,7 @@ blp = [-kron(xmin, Iden) + Ikk + Wbar; kron(xmax,Iden) - Ikk - Wbar ];
 u = binvar( M*K, 1);
 
 Constraints = [ Alp * u <= blp  ];
-Objective =  C' * ( repmat(Pmss,1, K)' .* u );
+Objective =  C' * ( repmat(Pmss,1, K)' .* u * Ts );
 solvesdp(Constraints, Objective,ops);
  
 uu = double(u);
@@ -93,7 +93,7 @@ end
 
 % Minute-wise pump state discretization
 
-u = kron( u, ones(K,1));
-EnergyCost = C' * (repmat(Pmss, 1, K)' .* uu )
+%u = kron( u, ones(K,1));
+EnergyCost = C' * ( repmat(Pmss, 1, K)' .* uu * Ts )
 Energy = 0;
 %Energy     = Pmss * uu ;

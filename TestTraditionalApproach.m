@@ -14,6 +14,7 @@ clear all
 Ts = 30;
 Rates  = [11.87 14.11 82.05 14.11 82.05 11.87];  % Electricity rates 
 Delta_C = 60/Ts*[6 1 3 8 4 2];                  % length in minutes of the constant price intervals
+perMinuteRate = [11.87 * ones( 60*6 , 1); 14.11 * ones( 60*1, 1); 82.05 * ones( 60*3, 1); 14.11 * ones( 60*8, 1); 82.05 * ones( 60*4, 1 ); 11.87 * ones( 60* 2, 1) ];
 
 % Cost of electricity in each timestep.
 C=[]
@@ -49,3 +50,11 @@ ops3 = sdpsettings('solver','lpsolve','cachesolvers',1);
 
 
 [u, Energy, EnergyCost] = TraditionalApproach( C, Delta_C, Ts , x0, A, B , W, xmax, xmin, Pmss, ops);
+
+Volumes = [];
+for i = 1:size(u,1)
+	Volumes = [ Volumes; x0' + sum(u(1:i,:) * -B') - i*Bw'];
+end
+
+
+%PlotVolumeEvolutionAndPumpsSignals( nMainTanks, nAuxiliarTanks, Volumes, u, perMinuteRate)
