@@ -26,10 +26,6 @@ function [ u, Energy, EnergyCost ] = TraditionalApproach( Cost, Delta_C, Ts , x0
 N  = size(W, 2);
 [n, M] = size(B);
 
-C=[]
-for i= 1: length(Cost)
-    C = [C; Cost(i) * ones(M, 1)];
-end
 
 % 1.- SAMPLING TIME DEFINITION
 
@@ -38,7 +34,7 @@ K  = sum(Delta_C);       % Number of sampling intervals.
 
 % 2.- DISCRETIZATION OF SYSTEM DYNAMICS
 Scd = ss( A, B, eye(n), zeros(n, M));
-Sdd = c2d(Scd,Ts,'zoh');
+Sdd = c2d(Scd, Ts,'zoh');
 Ad  = Sdd.a;
 Bd  = Sdd.b;
 
@@ -80,20 +76,22 @@ blp = [-kron(xmin, Iden) + Ikk + Wbar; kron(xmax,Iden) - Ikk - Wbar ];
 u = binvar( M*K, 1);
 
 Constraints = [ Alp * u <= blp  ];
-Objective =  C' * ( repmat(Pmss,1, K)' .* u * Ts );
-solvesdp(Constraints, Objective,ops);
- 
-uu = double(u);
 
-u=[];
+uu=[];
 for k = 1:2:2*K
-    u = [u; uu(k:k+1)'];       % Extracts control actions u to an MxN matrix
+    uu = [uu; u(k:k+1)'];       % Extracts control actions u to an MxN matrix
 end
 
+Pot= repmat(Pmss', 1, K)';
+C= repmat(Cost', 1, M);
+
+Objective =  sum( sum( C .* ( Pot .* uu * Ts )));
+solvesdp(Constraints, Objective,ops);
+ 
+uu = double(uu);
 
 % Minute-wise pump state discretization
 
-%u = kron( u, ones(K,1));
-EnergyCost = C' * ( repmat(Pmss, 1, K)' .* uu * Ts )
+EnergyCost = sum( sum( C .* ( Pot .* uu * Ts )));
 Energy = 0;
 %Energy     = Pmss * uu ;

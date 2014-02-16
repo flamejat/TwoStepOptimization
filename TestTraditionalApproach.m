@@ -51,10 +51,10 @@ ops3 = sdpsettings('solver','lpsolve','cachesolvers',1);
 
 [u, Energy, EnergyCost] = TraditionalApproach( C, Delta_C, Ts , x0, A, B , W, xmax, xmin, Pmss, ops);
 
-Volumes = [];
-for i = 1:size(u,1)
-	Volumes = [ Volumes; x0' + sum(u(1:i,:) * -B') - i*Bw'];
-end
+%Volumes = [];
+%for i = 1:size(u,1)
+%	Volumes = [ Volumes; x0' + sum(u(1:i,:) * -B') - i*Bw'];
+%end
 
 
 %PlotVolumeEvolutionAndPumpsSignals( nMainTanks, nAuxiliarTanks, Volumes, u, perMinuteRate)
