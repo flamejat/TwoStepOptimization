@@ -59,7 +59,7 @@ for i=1:K
     Ikk = [Ikk; Ad^(i-1) * x0];
 end
 
-wk =  repmat( W/Ts, 1, K);
+wk =  repmat( W, 1, K);
 
 Wbar = [];
 for i = 1:K
@@ -71,8 +71,6 @@ Alp = [ -Bbarrad; Bbarrad ];
 blp = [-kron(xmin, Iden) + Ikk + Wbar; kron(xmax,Iden) - Ikk - Wbar ];
 
 % 4.- SOLVER CALL
-
-
 u = binvar( M*K, 1);
 
 Constraints = [ Alp * u <= blp  ];
@@ -82,16 +80,16 @@ for k = 1:2:2*K
     uu = [uu; u(k:k+1)'];       % Extracts control actions u to an MxN matrix
 end
 
-Pot= repmat(Pmss', 1, K)';
-C= repmat(Cost', 1, M);
+Pot = repmat(Pmss', 1, K)';
+C   = repmat(Cost', 1, M);
 
-Objective =  sum( sum( C .* ( Pot .* uu * Ts )));
-solvesdp(Constraints, Objective,ops);
+Objective =  sum( sum( C .*  Pot .* uu * Ts ));
+solvesdp(Constraints, Objective, ops);
  
-uu = double(uu);
+u = double(uu);
 
 % Minute-wise pump state discretization
 
-EnergyCost = sum( sum( C .* ( Pot .* uu * Ts )));
+EnergyCost = sum( sum( C .*  Pot .* uu * Ts ));
 Energy = 0;
 %Energy     = Pmss * uu ;

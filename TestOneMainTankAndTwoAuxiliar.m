@@ -85,5 +85,5 @@ end
 
 %% Plot results
 % Plot the volume evolution of each tank and the pumping.
-
-PlotVolumeEvolutionAndPumpsSignals( nMainTanks, nAuxiliarTanks, Volumes, signals, perMinuteRate)
+Ts=1
+PlotVolumeEvolutionAndPumpsSignals( nMainTanks, nAuxiliarTanks, Volumes, signals, perMinuteRate, Ts)
