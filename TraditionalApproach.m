@@ -5,22 +5,22 @@
 % function [U, Energy, Cost] = TraditionalApproach(C, x0, A, B, W, Pmss, xmax, xmin)
 %
 % Inputs:
-%   C:          Electricity price per period. Vector 1xN.
+%   Cost:       Electricity price per time step. Vector 1xN.
+%   Ts:			sampling time. Integer
 %   x0:         Initial state value. Vector nx1.
 %   A:          Dynamic matrix. Matrix nxn.
 %   B:          Control Matrix. Matrix nxM.
 %   W:          Integral of disturbance per time interval. Matrix DxN.
-%   Pmss:       Steady state power consmption of each actuator. Vector 1xM.
 %   xmax:       Maximum state constraint. Matrix nx1.
 %   xmin:       Minimum state constraint. Matrix nx1.
-%   Ts:			sampling time. Integer
+%   Pmss:       Steady state power consmption of each actuator. Vector 1xM.
 %   ops:		Yalmip's solver options.
 % Outputs:
-%   U:          Integral control action. Matrix MxN.
+%   u:          Integral control action. Matrix MxN.
 %   Energy:     Amount of energy consumed. Real.
-%   Cost:       Energy cost. Real.
+%   EnergyCost:       Energy cost. Real.
 
-function [ u, Energy, EnergyCost ] = TraditionalApproach( Cost, Delta_C, Ts , x0, A, B , W, xmax, xmin, Pmss,ops);
+function [ u, Energy, EnergyCost ] = TraditionalApproach( Cost, Ts , x0, A, B , W, xmax, xmin, Pmss,ops);
 
 % 0. - VARIABLE DEFINITION
 N  = size(W, 2);
@@ -29,7 +29,7 @@ N  = size(W, 2);
 
 % 1.- SAMPLING TIME DEFINITION
 
-K  = sum(Delta_C);       % Number of sampling intervals.
+K  = length(Cost);       % Number of sampling intervals.
 
 
 % 2.- DISCRETIZATION OF SYSTEM DYNAMICS
@@ -80,16 +80,15 @@ for k = 1:2:2*K
     uu = [uu; u(k:k+1)'];       % Extracts control actions u to an MxN matrix
 end
 
-Pot = repmat(Pmss', 1, K)';
+Pow = repmat(Pmss', 1, K)';
 C   = repmat(Cost', 1, M);
 
-Objective =  sum( sum( C .*  Pot .* uu * Ts ));
-solvesdp(Constraints, Objective, ops);
- 
+Objective =  sum( sum( C .*  Pow .* uu * Ts ));
+solvesdp(Constraints, Objective, ops)
 u = double(uu);
 
 % Minute-wise pump state discretization
 
-EnergyCost = sum( sum( C .*  Pot .* uu * Ts ));
-Energy = 0;
+EnergyCost = sum( sum( C .*  Pow .* uu * Ts ));
+Energy = NaN;
 %Energy     = Pmss * uu ;

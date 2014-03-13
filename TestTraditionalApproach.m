@@ -5,20 +5,33 @@
 %% Setting up the problem
 %
 % NOTE: YALMIP AND SOLVERS PATHS MUST BE INSTALLED AND LOADED
+
 close all
 clear all
 
 % PROBLEM PARAMETERS
 
 % Electicity rates parameters
-Ts = 30;
+
+Ts = 60; %Timestep
+interval = 60*24; % Length of the interval to compute
+startComputationAtPriceInterval = 1;
+perMinuteRate = [11.87 * ones( 60*6 , 1); 14.11 * ones( 60*1, 1); 82.05 * ones( 60*3, 1); 14.11 * ones( 60*8, 1); 82.05 * ones( 60*4, 1 ); 11.87 * ones( 60* 2, 1) ];
 Rates  = [11.87 14.11 82.05 14.11 82.05 11.87];  % Electricity rates 
-Delta_C = 60/Ts*[6 1 3 8 4 2];                  % length in minutes of the constant price intervals
+Delta_C = 60/Ts*[6 1 3 8 4 2];                  % length in timestep of the constant price intervals
 
 % Cost of electricity in each timestep.
+sumInt = 0;
+for endInterval = startComputationAtPriceInterval:length(Delta_C)
+	sumInt = sumInt + Ts * Delta_C(endInterval);
+	if(sumInt >= interval) 
+		break 
+	end
+end
+
 C=[];
-for i = 1:length(Rates)
-	C =[ C, Rates(i).*ones( 1, Delta_C(i))];
+for i = startComputationAtPriceInterval:endInterval
+	C =[ C, Rates(i).* ones( 1, Delta_C(i))];
 end
 
 nAuxiliarTanks = 2;
@@ -35,7 +48,7 @@ W = Bw * Ts;
 
 % Initial Conditions and limits
 
-x0 = [2; 1; 1];                 	      % Initial State. V1 V2 V3
+x0 = [2; 1; 1];                 	  % Initial State. V1 V2 V3
 xmax = [4; 2; 2];                     % Maximum Volume
 xmin = [0.2; 0.2; 0.2];               % Minimum Volume
 P1   = 5;                             % Power of Pump 1 
@@ -47,12 +60,15 @@ ops = sdpsettings('solver','glpk');
 ops2  = sdpsettings('solver','lpsolve');
 ops3 = sdpsettings('solver','lpsolve','cachesolvers',1);
 
+% Solver call
+tic
+[u, Energy, EnergyCost] = TraditionalApproach( C, Ts, x0, A, B , W, xmax, xmin, Pmss, ops);
+timerVal = toc
 
-[u, Energy, EnergyCost] = TraditionalApproach( C, Delta_C, Ts , x0, A, B , W, xmax, xmin, Pmss, ops);
-
+% Compute volumes in each timestep
 Volumes = [];
 for i = 1:size(u,1)
-	Volumes = [ Volumes; x0' + sum(u(1:i,:) * -B'*Ts) - i*Bw'*Ts];
+	Volumes = [ Volumes; x0' + sum( u(1:i,:) * -B'*Ts) - i*Bw'*Ts];
 end
 
 
